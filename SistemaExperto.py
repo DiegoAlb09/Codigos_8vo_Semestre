@@ -1,16 +1,26 @@
+#Importamos la libreria "experta"
 from experta import *
 
+#fALTAN LAS RELGAS V4, V5, V6, V7, V8
+
+
+#Hechos sobre el usuario y su experiencia en senderismo
 class Senderismo(Fact):
-    """Hechos sobre el usuario y su experiencia en senderismo"""
+    """Hechos sobre el usuario y su experiencia"""
     pass
 
+#Determinamos las reglas, variables de entrada, intermedias
 class SistemaExpertoSenderismo(KnowledgeEngine):
+    
+    #Determinar el nivel de experiencia en Senderismo
+    #Variables de Entrada: V1, V2, V3, V4
+    #Variables intermedias: V10
+    #Variables de Salida: V14
 
-    # 🔹 Determinar el nivel de experiencia en senderismo
     @Rule(Senderismo(ha_realizado_senderismo=False))
     def nivel_principiante(self):
         self.declare(Senderismo(nivel_experiencia="Principiante"))
-
+    
     @Rule(Senderismo(ha_realizado_senderismo=True, frecuencia="Ocasionalmente"))
     def nivel_principiante_ocasional(self):
         self.declare(Senderismo(nivel_experiencia="Principiante"))
@@ -19,10 +29,41 @@ class SistemaExpertoSenderismo(KnowledgeEngine):
     def nivel_intermedio(self):
         self.declare(Senderismo(nivel_experiencia="Intermedio"))
 
-    @Rule(Senderismo(ha_realizado_senderismo=True, frecuencia="Frecuentemente"))
+    @Rule(Senderismo(ha_realizado_senderismo=True, frecuencia="Frecuentamente"))
     def nivel_avanzado(self):
         self.declare(Senderismo(nivel_experiencia="Avanzado"))
 
+    #V3
+    @Rule(Senderismo(ha_realizado_senderismo=False,ha_recorrido_distancia=False))
+    def distancia_recorrida(self):
+        self.declare(Senderismo(nivel_experiencia="Principiante"))
+
+    @Rule(Senderismo(ha_recorrido_distancia=True, frecuencia="Ocasionalmente"))
+    def distancia_recorrida(self):
+        self.declare(Senderismo(nivel_experiencia="Principiante"))
+
+    @Rule(Senderismo(ha_recorrido_distancia=True, frecuencia="Regularmente"))
+    def distancia_recorrida(self):
+        self.declare(Senderismo(nivel_experiencia="Intermedio"))
+
+    @Rule(Senderismo(ha_recorrido_distancia=True, frecuencia="Frecuentamente"))
+    def distancia_recorrida(self):
+        self.declare(Senderismo(nivel_experiencia="Avanzado"))
+
+    #V4
+    @Rule(Senderismo(tipo_senderos=False))
+    :def terrenos(self):
+        self.declare(Senderismo(nivel_experiencia="Principiante"))
+
+    @Rule(Senderismo(tipo_senderos=True, frecuencia="Ocasionalmente"))
+    def terrenos(self):
+        self.declare(Senderismo(nivel_experiencia="Principiante"))
+
+    """
+    Aun faltan integrar variables de entrada y relacionarlas con las intermedias
+    """
+    #------ Variables de Salida
+    #V14
     # 🔹 Verificación para recomendación de rutas
     @Rule(Senderismo(nivel_experiencia=MATCH.nivel))
     def verificar_ruta(self, nivel):
@@ -40,7 +81,8 @@ class SistemaExpertoSenderismo(KnowledgeEngine):
     @Rule(Senderismo(requiere_ruta=True, nivel_experiencia="Avanzado"))
     def recomendar_rutas_avanzado(self):
         print("Recomendación: Rutas de alta montaña y travesías largas.")
-
+    
+    #V15
     # 🔹 🔥 SOLUCIÓN: Cambiar cómo se activan las reglas del equipo
     @Rule(Senderismo(nivel_experiencia=MATCH.nivel))
     def verificar_equipo(self, nivel):
@@ -58,6 +100,7 @@ class SistemaExpertoSenderismo(KnowledgeEngine):
     def recomendar_equipo_avanzado(self):
         print("Recomendación de equipo: Equipo técnico, brújula/GPS y planificación avanzada.")
 
+    #V16
     # 🔹 Variables de seguridad
     @Rule(Senderismo(conoce_seguridad=False))
     def nivel_seguridad_bajo(self):
@@ -84,68 +127,69 @@ class SistemaExpertoSenderismo(KnowledgeEngine):
         print("\U0001F3D5️ Medidas de seguridad recomendadas: Capacidad para responder a emergencias, planificación avanzada y uso de equipo especializado.")
 
 if __name__ == "__main__":
-    # Inicializar el sistema experto
+    
+    #Inicializar el sistema experto 
     sistema = SistemaExpertoSenderismo()
     sistema.reset()
-    
+
     print("\n" + "="*60)
-    print("🏔️  BIENVENIDO AL SISTEMA EXPERTO DE SENDERISMO  🏔️")
+    print(" BIENVENIDO AL SISTEMA EXPERTO DE SENDERISMO ")
     print("="*60)
     print("Este sistema te proporcionará recomendaciones personalizadas")
     print("para rutas de senderismo, equipo necesario y medidas de seguridad")
     print("basado en tu nivel de experiencia.")
     print("="*60 + "\n")
-    
-    # Validar entrada para experiencia en senderismo
+
+    #Validadr entrada para experiencia en senderismo
     while True:
-        ha_realizado = input("¿Has realizado senderismo anteriormente? (si/no): ").lower()
-        if ha_realizado in ["si", "s", "sí", "yes", "y"]:
+        ha_realizado = input("¿Has realizado senderismo anteriormente? (Si/No): ").lower()
+        if ha_realizado in ["Si","Sí","si","s", "sí", "yes", "y"]:
             ha_realizado_senderismo = True
             break
-        elif ha_realizado in ["no", "n"]:
+        elif ha_realizado in ["No", "no", "N", "n"]:
             ha_realizado_senderismo = False
             frecuencia = None
             break
         else:
-            print("⚠️ Por favor, responde 'si' o 'no'.")
-    
-    # Preguntar frecuencia solo si ha hecho senderismo antes
+            print("Por favor, responda 'Si' o 'No'.")
+
+    #Preguntar frecuencia solo si ha hecho senderismo antes
     frecuencia = None
     if ha_realizado_senderismo:
         while True:
             print("\nIndica con qué frecuencia realizas senderismo:")
             print("1. Ocasionalmente (pocas veces al año)")
             print("2. Regularmente (mensualmente)")
-            print("3. Frecuentemente (semanalmente)")
-            
+            print("3. Frecuentamente (semanalmente)")
+
             opcion = input("Selecciona una opción (1-3): ")
-            
+
             if opcion == "1":
                 frecuencia = "Ocasionalmente"
                 break
-            elif opcion == "2":
+            if opcion == "2":
                 frecuencia = "Regularmente"
                 break
-            elif opcion == "3":
-                frecuencia = "Frecuentemente"
+            if opcion == "3":
+                frecuencia = "Frecuentamente"
                 break
             else:
-                print("⚠️ Por favor, selecciona una opción válida (1-3).")
+                print("Por favor, selecciona una opción válida (1-3).")
 
-    # Preguntar si has realizado senderos más de 10km
+    #Preguntar si has realizado senderos más de 10km
     if ha_realizado_senderismo:
         while True:
-           distancia = input("\n¿Ha realizado senderos de más de 10km? (si/no): ").lower()
-           if distancia in ["si", "s", "sí", "yes", "y"]:
-               distancia_mas_10 = True
-               break
-           elif distancia in ["no", "n"]:
-               distancia_mas_10 = False
-               break
-           else:
-               print("Por favor, responde 'si' o 'no'.")
+            distancia = input("\n¿Ha realizado senderos de más de 10km? (si/no): ").lower()
+            if distancia in ["si", "s", "sí", "yes", "y"]:
+                ha_recorrido_distancia = True
+                break
+            elif distancia in ["no", "n"]:
+                ha_recorrido_distancia = False
+                break
+            else:
+                print("Por favor, responde 'si' o 'no'.")
 
-    # Preguntar si ha recorrido terrenos accidentados o montañosos
+        # Preguntar si ha recorrido terrenos accidentados o montañosos
     if ha_realizado_senderismo:
         while True:
             terrenos = input("\n¿Ha caminado en terrenos accidentados o montañosos? (si/no): ").lower()
@@ -193,26 +237,29 @@ if __name__ == "__main__":
             break
         else:
             print("⚠️ Por favor, responde 'si' o 'no'.")
-            
-    print("Analizando tu perfil... 🔍")
-    print("-"*60 + "\n")
     
-    # Declarar los hechos basados en la entrada del usuario
+    print("Analizando tu perfil... ")
+    print("-"*60 + "\n")
+
+    #Declarar los hechos basados en la entrada del usuario
     if ha_realizado_senderismo:
         sistema.declare(Senderismo(
-            ha_realizado_senderismo=ha_realizado_senderismo,
-            frecuencia=frecuencia,
-            conoce_seguridad=conoce_seguridad
+            ha_realizado_senderismo = ha_realizado_senderismo
+            frecuencia = frecuencia,
+            conoce_seguridad = conoce_seguridad,
+            ha_recorrido_distancia = ha_recorrido_distancia,
+
         ))
     else:
         sistema.declare(Senderismo(
-            ha_realizado_senderismo=ha_realizado_senderismo,
-            conoce_seguridad=conoce_seguridad
+            ha_realizado_senderismo = ha_realizado_senderismo,
+            conoce_seguridad = conoce_seguridad,
+            ha_recorrido_distancia = ha_recorrido_distancia
         ))
-    
+
     # Ejecutar el sistema experto
     sistema.run()
-    
+
     print("\n" + "="*60)
     print("¡Gracias por utilizar nuestro sistema experto de senderismo!")
     print("¡Disfruta de tus aventuras de forma segura! 🌄")
