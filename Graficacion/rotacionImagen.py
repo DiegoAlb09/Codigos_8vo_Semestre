@@ -71,7 +71,7 @@ def procesar_imagenes(directorio):
     os.makedirs('resultados', exist_ok=True)
     
     # Ángulos de rotación
-    angulos = [0, 45, 90, 135]
+    angulos = [0, 45, 135]
     
     # Almacenar resultados
     resultados = []

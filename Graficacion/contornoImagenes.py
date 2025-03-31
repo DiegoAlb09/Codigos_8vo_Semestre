@@ -60,10 +60,10 @@ def graficar_contorno(imagen, nombre, contorno):
     plt.axis('off')
     
     # Imagen binaria
-    plt.subplot(132)
-    plt.imshow(imagen, cmap='gray')
-    plt.title(f'Imagen Binaria: {nombre}')
-    plt.axis('off')
+    #plt.subplot(132)
+    #plt.imshow(imagen, cmap='gray')
+    #plt.title(f'Imagen Binaria: {nombre}')
+    #plt.axis('off')
     
     # Contorno
     plt.subplot(133)
