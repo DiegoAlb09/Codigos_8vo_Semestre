@@ -12,7 +12,6 @@ if not os.path.exists("Imagenes_escaladas"):
     os.makedirs("Imagenes_escaladas")
     
 #1. Contar los pixeles 1 en cada imagenes
-
 for ruta in archivos:
     imagen = cv2.imread(ruta, cv2.IMREAD_GRAYSCALE)
 
@@ -28,6 +27,7 @@ for ruta in archivos:
 
 #2. Calcular el tamaño objetivo (media de pixeles 1)
 tamanio_objetivo = int(np.mean([num for _, num in pixeles_objetos if num > 0]))
+print(f"Tamaño objetivo (media de píxeles de objeto): {tamanio_objetivo}")
 
 #3. Aplicar escalado a cada imagen
 for ruta, pixeles_actual in pixeles_objetos:
@@ -48,8 +48,17 @@ for ruta, pixeles_actual in pixeles_objetos:
     #Redimensionar la imagen 
     imagen_escalada = cv2.resize(imagen_binaria, nuevo_tamanio, interpolation = cv2.INTER_NEAREST)
 
+    # Contar los píxeles de objeto en la imagen escalada
+    num_pixeles_objeto_escalada = np.count_nonzero(imagen_escalada == 255)
+
     #Guardar la imagen transformada
     nueva_ruta = f"Imagenes_escaladas/{os.path.basename(ruta)}"
     cv2.imwrite(nueva_ruta, imagen_escalada)
 
-    print(f"{ruta} escalada con factor a={factor_a:.3f}, nuevo tamaño: {nuevo_tamanio}")
+    print(f"{os.path.basename(ruta)}:")
+    print(f"  - Píxeles originales: {pixeles_actual}")
+    print(f"  - Píxeles después del escalado: {num_pixeles_objeto_escalada}")
+    print(f"  - Factor de escala: {factor_a:.3f}")
+    print(f"  - Nuevo tamaño: {nuevo_tamanio}")
+    print(f"  - Diferencia con el objetivo: {num_pixeles_objeto_escalada - tamanio_objetivo} píxeles")
+    print("-" * 50)
